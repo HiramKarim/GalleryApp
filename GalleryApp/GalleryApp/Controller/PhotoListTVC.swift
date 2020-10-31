@@ -13,56 +13,62 @@ class PhotoListTVC: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         self.navigationController?.navigationItem.title = "Galley"
+        
+        self.tableView.register(PhotoCell.nib, forCellReuseIdentifier: PhotoCell.identifier)
+        //self.tableView.rowHeight = 80
+        self.tableView.estimatedRowHeight = UITableView.automaticDimension
+        
+        fetchPhotos()
     }
     
     private func fetchPhotos() {
-        WebService.shared().load(resource: Photo.allPhotos, completion: { [weak self] (result) in
+        photoListVM.fetchPhotos { [weak self] (result) in
             guard let self = self else { return }
-            
-            switch result {
-            case .failure(let error):
-                print("DEBUG error \(error)")
-                break
-            case .success(let photos):
-                self.bindVM(using: photos)
-                break
+            if result {
+                DispatchQueue.main.async { self.tableView.reloadData() }
+            } else {
+                self.showAlert()
             }
-        })
+        }
     }
     
-    private func bindVM(using photos:[Photo]) {
-        photoListVM.photoVM = photos.map(PhotoVM.init)
+    /*
+    private func bindVM(using photos:PhotoData) {
+        photoListVM.photoVM = photos.photos?.map(PhotoVM.init) ?? []
+        DispatchQueue.main.async { self.tableView.reloadData() }
+    }
+    */
+    
+    private func showAlert() {
+        let alert = UIAlertController(title: "", message: photoListVM.errorMessage, preferredStyle: .alert)
+        alert.addAction( UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return photoListVM.photoVM.count
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell", for: indexPath) as? PhotoCell
+        else { return UITableViewCell() }
+        
+        cell.photoVM = photoListVM.getPhotoVM(at: indexPath.row)
+        
         return cell
     }
-    */
+    
 
     /*
     // Override to support conditional editing of the table view.

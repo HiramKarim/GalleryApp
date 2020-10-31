@@ -43,6 +43,9 @@ class WebService {
         request.httpMethod = resource.httpMethod.rawValue
         request.httpBody = resource.body
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("500pxstefan-skliarovV1.p.rapidapi.com", forHTTPHeaderField: "x-rapidapi-host")
+        request.addValue("f08ba48910mshe7bfa3d88b32d38p1bfd73jsn17e29ddae65c", forHTTPHeaderField: "x-rapidapi-key")
+        request.addValue("true", forHTTPHeaderField: "useQueryString")
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             

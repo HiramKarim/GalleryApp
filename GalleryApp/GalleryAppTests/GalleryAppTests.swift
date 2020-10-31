@@ -29,5 +29,10 @@ class GalleryAppTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+    
+    func testPhotoListViewModel() {
+        let photoListvm = PhotoListVM(photos: [PhotoVM(photo: Photo(id: 1, name: "", description: "", createdAt: ""))])
+        XCTAssertNotNil(photoListvm.getPhotoVM(at: 2))
+    }
 
 }
